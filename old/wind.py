@@ -1,1 +1,0 @@
-# erst wenn wieder objektorientiert
