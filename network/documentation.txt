@@ -1,0 +1,11 @@
+Input:
+Boat Position
+Boat headigdirection
+Boat drivingdirecion
+Boat Speed
+Angular speed
+Current Wind
+Goal
+
+Output:
+angular speed
