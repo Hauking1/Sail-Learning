@@ -19,6 +19,7 @@ function leeway_angle(boatdir::Float64, boatvelocity::SVector{2, Float64}, truew
         return 0.0 # TODO handle v=0
     else
         return apparent_wind_angle(truewind,boatvelocity) + π/2 - boatdir
+    end
 end
 
 
@@ -36,7 +37,7 @@ end
 
 function mirrorMatr(γ::Float64)::SMatrix(2,2,Float64)
     # mirror transformation at symmetry axis
-    return [cos(γ), sin(γ); sin(γ), -cos(γ)]
+    return [cos(γ) sin(γ); sin(γ) -cos(γ)]
 end
 
 
@@ -44,7 +45,7 @@ function force_aero(truewind::SVector{2,Float64}, boatvelocity::SVector{2,Float6
     γ = apparent_wind_angle(truewind,boatvelocity)
     α = angle_of_attack(γ)
     coeff_aero = coefficient_sail(α)
-    dirMatr = [1, 0; 1, 0] # TODO check signs!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    dirMatr = [1 0; 1 0] # TODO check signs!!!!!!!!!!!!!!!!!!!!!!!!!!!
     return force(const_aero,(truewind .- boatvelocity),coeff_aero,dirMatr)
 end
 
@@ -58,7 +59,7 @@ function force_hydr(boatdir::Float64, truewind::SVector{2,Float64}, boatvelocity
 end
 
 
-function acceleration(t,q_dot,truewind,boatdir)::SVector{3,Float64}
+function acceleration(t::Float64,q_dot::SVector{3,Float64},truewind::SVector{2,Float64},boatdir::Float64)::SVector{3,Float64}
     # 3d right hand side
     boatvelocity = q_dot[1:2]
     angularvelocity = q_dot[3]

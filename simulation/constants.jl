@@ -14,7 +14,7 @@ inertiaZ = 1200 # in kg*m^2
 
 # force constants
 const_aero = ρ_air*A_aero/2
-const_hydr = ρ_war*A_hydr/2
+const_hydr = ρ_wat*A_hydr/2
 
 # fit parameters for sail polars
 # lift fourier model
