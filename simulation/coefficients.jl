@@ -22,8 +22,8 @@ end
 
 
 function coefficient_hull(β::Float64, boatvelocity_sq::Float64)::SVector{2,Float64}
-    c_d = # wave drag ( ∝v^6*sin(...)) + friction drag (∝v^2)
-    c_l = # maybe some low dependency in β or 0
+    c_d = 0.5*boatvelocity_sq^3 # wave drag ( ∝v^6*sin(...)) + friction drag (∝v^2)
+    c_l = 0 # maybe some low dependency in β or 0
     return [c_d,c_l]
 end
 

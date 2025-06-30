@@ -1,9 +1,10 @@
 using StaticArrays
+using LinearAlgebra
 
 include("coefficients.jl")
 include("constants.jl")
 
-function apparent_wind_angle(truewind::SVector{2, Float64}, boatvelocity::SVector{2, Float64})::Float
+function apparent_wind_angle(truewind::SVector{2, Float64}, boatvelocity::SVector{2, Float64})::Float64
     appwind = truewind - boatvelocity
     return atan(appwind[2],appwind[1])
 end
@@ -15,7 +16,7 @@ end
 
 
 function leeway_angle(boatdir::Float64, boatvelocity::SVector{2, Float64}, truewind::SVector{2, Float64})::Float64
-    if dot(boatvelocity) == 0.0
+    if dot(boatvelocity,boatvelocity) == 0.0
         return 0.0 # TODO handle v=0
     else
         return apparent_wind_angle(truewind,boatvelocity) + π/2 - boatdir
@@ -35,9 +36,9 @@ function sail_angle(truewind::SVector{2,Float64}, boatdir::Float64, boatvelocity
 end
 
 
-function mirrorMatr(γ::Float64)::SMatrix(2,2,Float64)
+function mirrorMatr(γ::Float64)::SMatrix{2,2,Float64}
     # mirror transformation at symmetry axis
-    return [cos(γ) sin(γ); sin(γ) -cos(γ)]
+    return SMatrix{2,2}([cos(γ) sin(γ); sin(γ) -cos(γ)])
 end
 
 
@@ -45,7 +46,7 @@ function force_aero(truewind::SVector{2,Float64}, boatvelocity::SVector{2,Float6
     γ = apparent_wind_angle(truewind,boatvelocity)
     α = angle_of_attack(γ)
     coeff_aero = coefficient_sail(α)
-    dirMatr = [1 0; 1 0] # TODO check signs!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    dirMatr = SMatrix{2,2}([1.0 0.0; 1.0 0.0]) # TODO check signs!!!!!!!!!!!!!!!!!!!!!!!!!!!
     return force(const_aero,(truewind .- boatvelocity),coeff_aero,dirMatr)
 end
 
@@ -59,9 +60,15 @@ function force_hydr(boatdir::Float64, truewind::SVector{2,Float64}, boatvelocity
 end
 
 
-function acceleration(t::Float64,q_dot::SVector{3,Float64},truewind::SVector{2,Float64},boatdir::Float64)::SVector{3,Float64}
+function torque(angularvelocity::Float64)::Float64
+    return 0.0
+    
+end
+
+
+function acceleration(t::Float64,q::SVector{3,Float64},q_dot::SVector{3,Float64},truewind::SVector{2,Float64},boatdir::Float64)::SVector{3,Float64}
     # 3d right hand side
-    boatvelocity = q_dot[1:2]
+    boatvelocity = SVector(q_dot[1:2]...)
     angularvelocity = q_dot[3]
     forceX,forceY = force_aero(truewind,boatvelocity) .+ force_hydr(boatdir,truewind,boatvelocity)
     torqueZ = torque(angularvelocity)
